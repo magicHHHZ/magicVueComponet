@@ -1,7 +1,23 @@
-import logo from './assets/imgs/logo.png'
-import  './assets/css/my.css'
+import Vue from "vue";
+import App from "./app";//引入自定义组件
 
-const image = new Image()
-image.src = logo
-document.body.appendChild(image)
-document.getElementById('root').innerHTML = '<h1>Hello222</h1>'
+
+import "./base.css";
+
+Vue.config.productionTip = false //不显示不是生产环境的提示
+
+// 所有组件对象的原型对象是一个vm对象  ==> Vue原型对象是组件对象原型链上的对象
+// 创建一个全局的用于绑定事件监听和分发事件的对象: Global Event Bus(全局事件总线)
+// 事件总线对象就是一个vm
+// 将其挂载到Vue的原型对象上,所有组件对象就都可以看到这个事件总线对象
+// Vue.prototype.$globalEventBus = new Vue()
+new Vue({
+  // el:'#root'
+  beforeCreate() {
+    Vue.prototype.$globalEventBus = this 
+  },
+  components:{
+    App:App
+  },
+  template:'<App/>'
+}).$mount('#root')

@@ -1,66 +1,88 @@
+// __dirname: 代表当前文件所在目录的绝对路径  D:\work\190719\workspace\VueComponent
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const path = require('path')//用来解析路径相关的模块
+const { VueLoaderPlugin } = require('vue-loader')
+const path = require('path') // 用来解析路径相关信息的模块
 
-
-module.exports = {//配置对象
-  
-
-  //入口
-
-  entry:{
-    xxx: path.resolve(__dirname ,'src/index.js') //入口文件的路径
+module.exports = { // 配置对象
+  // 入口
+  entry: {
+    xxx: path.resolve(__dirname, 'src/index.js')
+  },
+  // 出口
+  output: {
+    filename: 'static/js/[name].bundle.js', // 可以带路径
+    path: path.resolve(__dirname, 'dist')
   },
 
-
-  //出口
-  output:{
-    filename:'static/js/[name].bundle.js', //可以带路径
-    path:path.resolve(__dirname,'dist')
-  },
-  // mode:'developemt',
-
-  //模块加载器
-  module:{
-    rules:[
-
-      //处理es6 ==> es5
+  // 模块加载器
+  module: {
+    rules: [
+      // 处理 ES6 ==> ES5
       {
-        test: /\.js$/,//用于匹配文件,对哪些文件进行处理
-        // exclude: /(node_modules|bower_components)/,
-        include:[path.resolve(__dirname,'src')],//只针对哪些处理
+        test: /\.js$/, // 用于匹配文件(对哪些文件进行处理)
+        // exclude: /node_modules/,
+        include: [path.resolve(__dirname, 'src')], // 只针对哪些处理
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']//预设包:包含多个常用插件包的一个大包
+            presets: ['@babel/preset-env'], // 预设包: 包含多个常用插件包的一个大包
           }
         }
       },
-      //处理css
+      // 处理CSS
       {
-        test: /\.css$/i,
-        use: ["style-loader", "css-loader"],
+        test: /\.css$/,
+        use: ['vue-style-loader', 'css-loader'],
       },
       // 处理图片
       {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 1000,
-          name: 'static/img/[name].[hash:7].[ext]' // 相对于output.path
-        }
+        test: /\.(png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+              name: 'static/img/[name].[hash:7].[ext]', // 相对于output.path
+              esModule: false,
+            },
+            
+          }
+        ],
+        type: 'javascript/auto',
+      },
+      // 处理vue单文件组件模块
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
       }
     ]
   },
 
-  //插件
-  plugins:[
+  // 插件
+  plugins: [
     new HtmlWebpackPlugin({
-      template:'index.html',//将哪个页面作为模板页面处理(在根目录下查找)
-      filename:'index.html'//生成页面,(在output指定的path下)
-    })
+      template: 'index.html', // 将哪个页面作为模板页面处理(在根目录查找)
+      filename: 'index.html' // 生成页面(在output指定的path下)
+    }),
+    new VueLoaderPlugin()
   ],
-  devServer:{
-    open: true,//自动打开浏览器
-    
+  // 开发服务器的配置
+  devServer: {
+    // port: 8080,
+    open: true, // 自动打开浏览器
+    // quiet: true, // 不做太多日志输出
+  },
+
+  // 开启source-map调试
+  devtool: 'eval-cheap-module-source-map',
+
+  // 引入模块的解析
+  resolve: {
+    extensions: ['.js', '.vue', '.json'], // 可以省略的后缀名
+    alias: { // 路径别名(简写方式)
+      'vue$': 'vue/dist/vue.esm.js',  // 表示精准匹配   带vue编译器
+      '@': path.resolve(__dirname,'src'),
+      '@compentents': path.resolve(__dirname,'src/compentents')
+    }
   }
 }
