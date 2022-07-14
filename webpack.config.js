@@ -1,6 +1,7 @@
 // __dirname: 代表当前文件所在目录的绝对路径  D:\work\190719\workspace\VueComponent
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const { VueLoaderPlugin } = require('vue-loader')
+// const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const path = require('path') // 用来解析路径相关信息的模块
 
 module.exports = { // 配置对象
@@ -25,14 +26,21 @@ module.exports = { // 配置对象
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env'], // 预设包: 包含多个常用插件包的一个大包
+            presets: [
+              [
+                '@babel/preset-env',{
+                  useBuiltIns:'usage',
+                  'corejs':2
+                }
+              ]
+            ], // 预设包: 包含多个常用插件包的一个大包
           }
         }
       },
       // 处理CSS
       {
         test: /\.css$/,
-        use: ['vue-style-loader', 'css-loader'],
+        use: ['style-loader', 'css-loader'],
       },
       // 处理图片
       {
@@ -64,6 +72,7 @@ module.exports = { // 配置对象
       template: 'index.html', // 将哪个页面作为模板页面处理(在根目录查找)
       filename: 'index.html' // 生成页面(在output指定的path下)
     }),
+    // new MiniCssExtractPlugin(),
     new VueLoaderPlugin()
   ],
   // 开发服务器的配置
@@ -71,6 +80,24 @@ module.exports = { // 配置对象
     // port: 8080,
     open: true, // 自动打开浏览器
     // quiet: true, // 不做太多日志输出
+    proxy: {
+      // 处理以/api开头路径的请求
+      // '/api': 'http://localhost:4000'   // http://localhost:4000/api/search/users
+      '/api': {
+        target: 'http://localhost:4000', // 转发的目标地址
+        pathRewrite: {
+          '^/api' : ''  // 转发请求时去除路径前面的/api
+        },
+      },
+
+      '/gh': {
+        target: 'https://api.github.com', // 转发的目标地址
+        pathRewrite: {
+          '^/gh' : ''  // 转发请求时去除路径前面的/api
+        },
+        changeOrigin: true, // 支持跨域, 如果协议/主机也不相同, 必须加上
+      }
+    }
   },
 
   // 开启source-map调试

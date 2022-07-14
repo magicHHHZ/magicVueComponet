@@ -1,9 +1,10 @@
 import Vue from "vue";
-// import vueResouce from "vue-resource";
+import vueResouce from "vue-resource";
 import App from "./app";//引入自定义组件
-import 'bootstrap/dist/css/bootstrap.css'
 
 
+// 声明使用Vue插件
+Vue.use(vueResouce)//内部给所有的组件对象都添加了一个属性对象:$http
 
 Vue.config.productionTip = false //不显示不是生产环境的提示
 
@@ -13,10 +14,6 @@ Vue.config.productionTip = false //不显示不是生产环境的提示
 // 将其挂载到Vue的原型对象上,所有组件对象就都可以看到这个事件总线对象
 // Vue.prototype.$globalEventBus = new Vue()
 new Vue({
-  beforeCreate() {
-    //将当前vm对象作为事件总线对象保存到Vue的原型对象上(让所有的组件对象都可见)
-    Vue.prototype.$eventBus = this
-  },
   // el:'#root'
   components:{
     App:App
