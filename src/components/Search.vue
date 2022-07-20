@@ -19,8 +19,8 @@ export default {
     search(){
       const searchName = this.searchName
       if (searchName) {
-        //分发自定义事件(search)
-        this.$eventBus.$emit('search',searchName)
+        //触发异步action search调用
+        this.$store.dispatch('search',searchName)
         this.searchName = ''
       }
       
